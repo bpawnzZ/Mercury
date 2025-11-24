@@ -68,9 +68,8 @@ jobs:
         echo "Cloning mozilla-unified repository with Mercurial..."
         hg clone https://hg.mozilla.org/mozilla-unified mozilla-unified
         cd mozilla-unified
-        # Run mach bootstrap for build dependencies
-        echo "Running mach bootstrap for build dependencies..."
-        python3 mach bootstrap --application-choice=browser
+        # Skip mach bootstrap since we've installed all dependencies manually
+        echo "Skipping mach bootstrap - dependencies already installed manually"
         # Verify the repository structure
         ls -la /home/runner/mozilla-unified/
       env:
