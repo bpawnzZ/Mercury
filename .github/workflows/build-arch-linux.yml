@@ -64,13 +64,15 @@ jobs:
         cd /home/runner
         # Set TERM to avoid tput errors
         export TERM=xterm
-        # Download and run bootstrap directly
-        echo "Downloading Mozilla bootstrap..."
-        curl -L https://hg.mozilla.org/mozilla-central/raw-file/default/python/mozboot/bin/bootstrap.py -O
-        echo "Running bootstrap..."
-        python3 bootstrap.py --application-choice=browser --no-interactive
-        # Check if mozilla-unified was created
-        ls -la /home/runner/mozilla-unified/ || echo "mozilla-unified not created"
+        # Manually clone mozilla-unified using Mercurial (not Git)
+        echo "Cloning mozilla-unified repository with Mercurial..."
+        hg clone https://hg.mozilla.org/mozilla-unified mozilla-unified
+        cd mozilla-unified
+        # Run mach bootstrap for build dependencies
+        echo "Running mach bootstrap for build dependencies..."
+        python3 mach bootstrap --application-choice=browser --no-interactive
+        # Verify the repository structure
+        ls -la /home/runner/mozilla-unified/
       env:
         HOME: /home/runner
 
@@ -87,6 +89,7 @@ jobs:
       run: |
         cd /home/runner/Mercury
         export MOZ_MAKE_FLAGS="-j$(nproc)"
+        export TERM=xterm
         ./build.sh
       env:
         HOME: /home/runner
@@ -97,6 +100,7 @@ jobs:
     - name: Package Mercury
       run: |
         cd /home/runner/Mercury
+        export TERM=xterm
         ./package.sh
       env:
         HOME: /home/runner
