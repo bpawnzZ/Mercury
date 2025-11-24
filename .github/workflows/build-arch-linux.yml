@@ -80,41 +80,39 @@ jobs:
         cd /home/runner/Mercury
         export TERM=xterm
         # Create a minimal mozconfig inline to avoid file path issues
-        cat > /home/runner/mozilla-unified/mozconfig << 'MOZCONFIG_EOF'
-# Minimal mozconfig for GitHub Actions build
-
-# Build only Firefox browser
-ac_add_options --enable-application=browser
-
-# Build for Linux
-ac_add_options --target=x86_64-pc-linux-gnu
-ac_add_options --enable-default-toolkit=cairo-gtk3-x11-wayland
-
-# Optimization settings
-ac_add_options --enable-release
-ac_add_options --disable-debug
-ac_add_options --disable-debug-symbols
-ac_add_options --disable-tests
-ac_add_options --enable-strip
-
-# Basic features
-ac_add_options --enable-sandbox
-ac_add_options --enable-webrtc
-ac_add_options --enable-pulseaudio
-ac_add_options --enable-alsa
-
-# Branding
-ac_add_options --with-app-name=mercury
-ac_add_options --with-app-basename=Mercury
-ac_add_options --with-branding=browser/branding/mercury
-ac_add_options --with-distribution-id=com.alex313031.mercury
-
-# Make flags
-mk_add_options MOZ_MAKE_FLAGS="-j$(nproc)"
-
-# Autoclobber
-mk_add_options AUTOCLOBBER=1
-MOZCONFIG_EOF
+        echo "# Minimal mozconfig for GitHub Actions build" > /home/runner/mozilla-unified/mozconfig
+        echo "" >> /home/runner/mozilla-unified/mozconfig
+        echo "# Build only Firefox browser" >> /home/runner/mozilla-unified/mozconfig
+        echo "ac_add_options --enable-application=browser" >> /home/runner/mozilla-unified/mozconfig
+        echo "" >> /home/runner/mozilla-unified/mozconfig
+        echo "# Build for Linux" >> /home/runner/mozilla-unified/mozconfig
+        echo "ac_add_options --target=x86_64-pc-linux-gnu" >> /home/runner/mozilla-unified/mozconfig
+        echo "ac_add_options --enable-default-toolkit=cairo-gtk3-x11-wayland" >> /home/runner/mozilla-unified/mozconfig
+        echo "" >> /home/runner/mozilla-unified/mozconfig
+        echo "# Optimization settings" >> /home/runner/mozilla-unified/mozconfig
+        echo "ac_add_options --enable-release" >> /home/runner/mozilla-unified/mozconfig
+        echo "ac_add_options --disable-debug" >> /home/runner/mozilla-unified/mozconfig
+        echo "ac_add_options --disable-debug-symbols" >> /home/runner/mozilla-unified/mozconfig
+        echo "ac_add_options --disable-tests" >> /home/runner/mozilla-unified/mozconfig
+        echo "ac_add_options --enable-strip" >> /home/runner/mozilla-unified/mozconfig
+        echo "" >> /home/runner/mozilla-unified/mozconfig
+        echo "# Basic features" >> /home/runner/mozilla-unified/mozconfig
+        echo "ac_add_options --enable-sandbox" >> /home/runner/mozilla-unified/mozconfig
+        echo "ac_add_options --enable-webrtc" >> /home/runner/mozilla-unified/mozconfig
+        echo "ac_add_options --enable-pulseaudio" >> /home/runner/mozilla-unified/mozconfig
+        echo "ac_add_options --enable-alsa" >> /home/runner/mozilla-unified/mozconfig
+        echo "" >> /home/runner/mozilla-unified/mozconfig
+        echo "# Branding" >> /home/runner/mozilla-unified/mozconfig
+        echo "ac_add_options --with-app-name=mercury" >> /home/runner/mozilla-unified/mozconfig
+        echo "ac_add_options --with-app-basename=Mercury" >> /home/runner/mozilla-unified/mozconfig
+        echo "ac_add_options --with-branding=browser/branding/mercury" >> /home/runner/mozilla-unified/mozconfig
+        echo "ac_add_options --with-distribution-id=com.alex313031.mercury" >> /home/runner/mozilla-unified/mozconfig
+        echo "" >> /home/runner/mozilla-unified/mozconfig
+        echo "# Make flags" >> /home/runner/mozilla-unified/mozconfig
+        echo 'mk_add_options MOZ_MAKE_FLAGS="-j$(nproc)"' >> /home/runner/mozilla-unified/mozconfig
+        echo "" >> /home/runner/mozilla-unified/mozconfig
+        echo "# Autoclobber" >> /home/runner/mozilla-unified/mozconfig
+        echo "mk_add_options AUTOCLOBBER=1" >> /home/runner/mozilla-unified/mozconfig
         # Copy Mercury source files
         cp -r -v ./app/. /home/runner/mozilla-unified/browser/app/
         cp -r -v ./browser/. /home/runner/mozilla-unified/browser/
