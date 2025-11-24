@@ -70,7 +70,7 @@ jobs:
         cd mozilla-unified
         # Run mach bootstrap for build dependencies
         echo "Running mach bootstrap for build dependencies..."
-        python3 mach bootstrap --application-choice=browser --no-interactive
+        python3 mach bootstrap --application-choice=browser
         # Verify the repository structure
         ls -la /home/runner/mozilla-unified/
       env:
