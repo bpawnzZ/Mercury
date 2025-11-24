@@ -46,7 +46,7 @@ arch=('x86_64')
 url="https://github.com/Alex313031/Mercury"
 license=('MPL2')
 depends=('gtk3' 'dbus-glib' 'nss' 'alsa-lib' 'libxt' 'libx11' 'libxrender' 'libxcomposite'
-         'libxdamage' 'libxfixes' 'libxext' 'libxi' 'libxcursor' 'libxrandr' 'libxscrnsaver'
+         'libxdamage' 'libxfixes' 'libxext' 'libxi' 'libxcursor' 'libxrandr' 'libxss'
          'libxxf86vm' 'libxinerama' 'libglvnd' 'pulseaudio' 'mesa' 'libpulse' 'libevent'
          'libjpeg-turbo' 'libpng' 'libwebp' 'libtiff' 'libvpx' 'wayland')
 optdepends=('ffmpeg: HTML5 video/audio support'

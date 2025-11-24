@@ -22,11 +22,11 @@ jobs:
       run: |
         pacman -Syu --noconfirm
         pacman -S --noconfirm base-devel git mercurial python python-pip rust clang llvm lld \
-          cmake ninja autoconf2.13 bison flex gawk curl wget tar zip unzip p7zip \
+          cmake ninja autoconf bison flex gawk curl wget tar zip unzip p7zip \
           libjpeg-turbo libpng libwebp libtiff libvpx libevent nss nspr \
-          gtk3 gtk2 dbus-glib alsa-lib pulseaudio mesa libpulse \
+          gtk3 dbus-glib alsa-lib pulseaudio mesa libpulse \
           libxt libx11 libxrender libxcomposite libxdamage libxfixes \
-          libxext libxi libxcursor libxrandr libxscrnsaver libxxf86vm \
+          libxext libxi libxcursor libxrandr libxss libxxf86vm \
           libxinerama libglvnd wayland libva mesa-vdpau vulkan-icd-loader \
           yasm nasm nodejs npm
 
