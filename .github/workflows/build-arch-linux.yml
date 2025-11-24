@@ -32,8 +32,13 @@ jobs:
 
     - name: Install additional build tools
       run: |
+        # Create virtual environment for Python packages
+        python -m venv /opt/build-venv
+        source /opt/build-venv/bin/activate
         pip install --upgrade pip
         pip install virtualenv
+        # Install Mozilla build system dependencies
+        pip install requests pytoml
 
     - name: Checkout Mercury repository
       uses: actions/checkout@v4
@@ -55,6 +60,7 @@ jobs:
 
     - name: Bootstrap Mozilla source
       run: |
+        source /opt/build-venv/bin/activate
         cd /home/runner/Mercury
         ./bootstrap.sh --linux
       env:
