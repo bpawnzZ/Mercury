@@ -79,7 +79,22 @@ jobs:
       run: |
         cd /home/runner/Mercury
         export TERM=xterm
-        ./setup.sh
+        # Use minimal mozconfig for compatibility
+        cp .github/mozconfig-minimal /home/runner/mozilla-unified/mozconfig
+        # Copy Mercury source files
+        cp -r -v ./app/. /home/runner/mozilla-unified/browser/app/
+        cp -r -v ./browser/. /home/runner/mozilla-unified/browser/
+        cp -r -v ./build/. /home/runner/mozilla-unified/build/
+        cp -r -v ./devtools/. /home/runner/mozilla-unified/devtools/
+        cp -r -v ./ipc/. /home/runner/mozilla-unified/ipc/
+        cp -r -v ./moz.build /home/runner/mozilla-unified/
+        cp -r -v ./netwerk/. /home/runner/mozilla-unified/netwerk/
+        cp -r -v ./other-licenses/. /home/runner/mozilla-unified/other-licenses/
+        mkdir -p -v /home/runner/mozilla-unified/policies
+        cp -r -v ./policies/. /home/runner/mozilla-unified/policies/
+        cp -r -v ./toolkit/. /home/runner/mozilla-unified/toolkit/
+        cp -r -v ./testing/. /home/runner/mozilla-unified/testing/
+        cp -v ./mozconfigs/ga /home/runner/mozilla-unified/
       env:
         HOME: /home/runner
         HG_SRC_DIR: /home/runner/mozilla-unified
