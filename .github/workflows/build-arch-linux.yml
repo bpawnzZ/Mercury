@@ -79,8 +79,8 @@ jobs:
       run: |
         cd /home/runner/Mercury
         export TERM=xterm
-        # Remove any existing mozconfig to avoid compatibility issues
-        rm -f /home/runner/mozilla-unified/mozconfig
+        # Copy the Mercury mozconfig to the build directory
+        cp -v ./mozconfigs/mozconfig /home/runner/mozilla-unified/mozconfig
         # Copy Mercury source files
         cp -r -v ./app/. /home/runner/mozilla-unified/browser/app/
         cp -r -v ./browser/. /home/runner/mozilla-unified/browser/
@@ -94,6 +94,7 @@ jobs:
         cp -r -v ./policies/. /home/runner/mozilla-unified/policies/
         cp -r -v ./toolkit/. /home/runner/mozilla-unified/toolkit/
         cp -r -v ./testing/. /home/runner/mozilla-unified/testing/
+        cp -v ./mozconfigs/ga /home/runner/mozilla-unified/
       env:
         HOME: /home/runner
         HG_SRC_DIR: /home/runner/mozilla-unified
@@ -103,8 +104,8 @@ jobs:
         cd /home/runner/mozilla-unified
         export MOZ_MAKE_FLAGS="-j$(nproc)"
         export TERM=xterm
-        # Build with Mercury branding options
-        ./mach build --enable-application=browser --with-app-name=mercury --with-branding=browser/branding/mercury
+        # Build Mercury using the mozconfig file
+        ./mach build
       env:
         HOME: /home/runner
         MOZ_MAKE_FLAGS: "-j$(nproc)"
