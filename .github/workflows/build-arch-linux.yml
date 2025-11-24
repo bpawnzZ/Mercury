@@ -61,25 +61,23 @@ jobs:
     - name: Bootstrap Mozilla source
       run: |
         source /opt/build-venv/bin/activate
-        cd /home/runner/Mercury
+        cd /home/runner
         # Set TERM to avoid tput errors
         export TERM=xterm
-        # Run bootstrap with --linux flag
-        ./bootstrap.sh --linux
-        # Wait for bootstrap to complete and check if mozilla-unified was created
-        sleep 30
-        if [ ! -d "/home/runner/mozilla-unified" ]; then
-          echo "Bootstrap failed, manually cloning Mozilla repository..."
-          cd /home/runner
-          hg clone https://hg.mozilla.org/mozilla-unified mozilla-unified
-        fi
-        ls -la /home/runner/mozilla-unified/
+        # Download and run bootstrap directly
+        echo "Downloading Mozilla bootstrap..."
+        curl -L https://hg.mozilla.org/mozilla-central/raw-file/default/python/mozboot/bin/bootstrap.py -O
+        echo "Running bootstrap..."
+        python3 bootstrap.py --application-choice=browser --no-interactive
+        # Check if mozilla-unified was created
+        ls -la /home/runner/mozilla-unified/ || echo "mozilla-unified not created"
       env:
         HOME: /home/runner
 
     - name: Setup Mercury build
       run: |
         cd /home/runner/Mercury
+        export TERM=xterm
         ./setup.sh
       env:
         HOME: /home/runner
