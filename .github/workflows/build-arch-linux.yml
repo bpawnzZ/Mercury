@@ -1,0 +1,120 @@
+name: Build Mercury for Arch Linux
+
+on:
+  push:
+    branches: [ main, develop ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+  schedule:
+    # Build daily at 06:00 UTC
+    - cron: '0 6 * * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+
+    steps:
+    - name: Update Arch Linux and install dependencies
+      run: |
+        pacman -Syu --noconfirm
+        pacman -S --noconfirm base-devel git mercurial python python-pip rust clang llvm lld \
+          cmake ninja autoconf2.13 bison flex gawk curl wget tar zip unzip p7zip \
+          libjpeg-turbo libpng libwebp libtiff libvpx libevent nss nspr \
+          gtk3 gtk2 dbus-glib alsa-lib pulseaudio mesa libpulse \
+          libxt libx11 libxrender libxcomposite libxdamage libxfixes \
+          libxext libxi libxcursor libxrandr libxscrnsaver libxxf86vm \
+          libxinerama libglvnd wayland libva mesa-vdpau vulkan-icd-loader \
+          yasm nasm nodejs npm
+
+    - name: Install additional build tools
+      run: |
+        pip install --upgrade pip
+        pip install virtualenv
+
+    - name: Checkout Mercury repository
+      uses: actions/checkout@v4
+      with:
+        path: mercury-source
+
+    - name: Setup environment
+      run: |
+        # Create build directories
+        mkdir -p /home/runner/mozilla-unified
+        mkdir -p /home/runner/Mercury
+
+        # Copy Mercury source to expected location
+        cp -r mercury-source/* /home/runner/Mercury/
+        cd /home/runner/Mercury
+
+        # Make scripts executable
+        chmod +x *.sh
+
+    - name: Bootstrap Mozilla source
+      run: |
+        cd /home/runner/Mercury
+        ./bootstrap.sh --linux
+      env:
+        HOME: /home/runner
+
+    - name: Setup Mercury build
+      run: |
+        cd /home/runner/Mercury
+        ./setup.sh
+      env:
+        HOME: /home/runner
+        HG_SRC_DIR: /home/runner/mozilla-unified
+
+    - name: Build Mercury
+      run: |
+        cd /home/runner/Mercury
+        export MOZ_MAKE_FLAGS="-j$(nproc)"
+        ./build.sh
+      env:
+        HOME: /home/runner
+        HG_SRC_DIR: /home/runner/mozilla-unified
+        MOZ_MAKE_FLAGS: "-j$(nproc)"
+      timeout-minutes: 120
+
+    - name: Package Mercury
+      run: |
+        cd /home/runner/Mercury
+        ./package.sh
+      env:
+        HOME: /home/runner
+        HG_SRC_DIR: /home/runner/mozilla-unified
+
+    - name: Find and copy built package
+      run: |
+        cd /home/runner/mozilla-unified
+        find . -name "Mercury*.tar.bz2" -type f | head -1 | xargs -I {} cp {} /home/runner/
+        ls -la /home/runner/*.tar.bz2
+
+    - name: Upload built package
+      uses: actions/upload-artifact@v4
+      with:
+        name: mercury-arch-linux
+        path: /home/runner/*.tar.bz2
+        retention-days: 30
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+    - name: Download built package
+      uses: actions/download-artifact@v4
+      with:
+        name: mercury-arch-linux
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: Mercury*.tar.bz2
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -1,0 +1,131 @@
+name: Build Arch Linux Package
+
+on:
+  push:
+    branches: [ main ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main ]
+  workflow_dispatch:
+  schedule:
+    # Run weekly on Sunday at 00:00 UTC
+    - cron: '0 0 * * 0'
+
+jobs:
+  build-package:
+    runs-on: ubuntu-latest
+    container:
+      image: archlinux:latest
+
+    steps:
+    - name: Update Arch Linux and install AUR tools
+      run: |
+        pacman -Syu --noconfirm
+        pacman -S --noconfirm base-devel git sudo
+
+    - name: Setup non-root user for makepkg
+      run: |
+        useradd -m builder
+        echo 'builder ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+
+    - name: Checkout Mercury repository
+      uses: actions/checkout@v4
+      with:
+        path: /home/builder/mercury
+
+    - name: Create PKGBUILD
+      run: |
+        cat > /home/builder/PKGBUILD << 'EOF'
+# Maintainer: Your Name <your.email@example.com>
+
+pkgname=mercury-browser
+pkgver=1.0.0
+pkgrel=1
+pkgdesc="Mercury Browser - A privacy-focused web browser based on Firefox"
+arch=('x86_64')
+url="https://github.com/Alex313031/Mercury"
+license=('MPL2')
+depends=('gtk3' 'dbus-glib' 'nss' 'alsa-lib' 'libxt' 'libx11' 'libxrender' 'libxcomposite'
+         'libxdamage' 'libxfixes' 'libxext' 'libxi' 'libxcursor' 'libxrandr' 'libxscrnsaver'
+         'libxxf86vm' 'libxinerama' 'libglvnd' 'pulseaudio' 'mesa' 'libpulse' 'libevent'
+         'libjpeg-turbo' 'libpng' 'libwebp' 'libtiff' 'libvpx' 'wayland')
+optdepends=('ffmpeg: HTML5 video/audio support'
+            'networkmanager: Location detection via available WiFi networks')
+provides=('mercury')
+conflicts=('mercury')
+options=('!strip' '!emptydirs')
+
+package() {
+  cd "${srcdir}"
+
+  # Create directories
+  install -d "${pkgdir}/usr/lib/mercury"
+  install -d "${pkgdir}/usr/bin"
+  install -d "${pkgdir}/usr/share/applications"
+  install -d "${pkgdir}/usr/share/pixmaps"
+
+  # Extract the built Mercury package
+  # This assumes the build workflow produces a tarball
+  tar -xf mercury-*.tar.bz2 -C "${pkgdir}/usr/lib/mercury/" --strip-components=1
+
+  # Create executable symlink
+  ln -sf /usr/lib/mercury/mercury "${pkgdir}/usr/bin/mercury"
+
+  # Install desktop file
+  cat > "${pkgdir}/usr/share/applications/mercury.desktop" << 'DESKTOP'
+[Desktop Entry]
+Version=1.0
+Name=Mercury Browser
+GenericName=Web Browser
+Comment=Privacy-focused web browser based on Firefox
+Exec=/usr/bin/mercury %u
+Icon=mercury
+Terminal=false
+Type=Application
+MimeType=text/html;text/xml;application/xhtml+xml;
+Categories=Network;WebBrowser;
+StartupNotify=true
+DESKTOP
+
+  # Install icon (you'll need to provide this)
+  # cp mercury-source/browser/branding/mercury/default*.png "${pkgdir}/usr/share/pixmaps/mercury.png"
+}
+EOF
+
+    - name: Build package
+      run: |
+        chown -R builder:builder /home/builder
+        sudo -u builder bash -c "cd /home/builder && makepkg -s --noconfirm"
+
+    - name: Upload package artifact
+      run: |
+        cp /home/builder/*.pkg.tar.* ./
+        ls -la *.pkg.tar.*
+
+    - name: Upload Arch package
+      uses: actions/upload-artifact@v4
+      with:
+        name: mercury-arch-package
+        path: *.pkg.tar.*
+        retention-days: 30
+
+  publish-release:
+    needs: build-package
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+
+    steps:
+    - name: Download built package
+      uses: actions/download-artifact@v4
+      with:
+        name: mercury-arch-package
+
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: |
+          *.pkg.tar.*
+          mercury-*.tar.bz2
+        generate_release_notes: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
