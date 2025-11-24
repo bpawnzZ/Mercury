@@ -62,7 +62,18 @@ jobs:
       run: |
         source /opt/build-venv/bin/activate
         cd /home/runner/Mercury
+        # Set TERM to avoid tput errors
+        export TERM=xterm
+        # Run bootstrap with --linux flag
         ./bootstrap.sh --linux
+        # Wait for bootstrap to complete and check if mozilla-unified was created
+        sleep 30
+        if [ ! -d "/home/runner/mozilla-unified" ]; then
+          echo "Bootstrap failed, manually cloning Mozilla repository..."
+          cd /home/runner
+          hg clone https://hg.mozilla.org/mozilla-unified mozilla-unified
+        fi
+        ls -la /home/runner/mozilla-unified/
       env:
         HOME: /home/runner
 
