@@ -80,7 +80,7 @@ jobs:
         cd /home/runner/Mercury
         export TERM=xterm
         # Create a minimal mozconfig inline to avoid file path issues
-        cat > /home/runner/mozilla-unified/mozconfig << 'EOF'
+        cat > /home/runner/mozilla-unified/mozconfig << 'MOZCONFIG_EOF'
 # Minimal mozconfig for GitHub Actions build
 
 # Build only Firefox browser
@@ -114,7 +114,7 @@ mk_add_options MOZ_MAKE_FLAGS="-j$(nproc)"
 
 # Autoclobber
 mk_add_options AUTOCLOBBER=1
-EOF
+MOZCONFIG_EOF
         # Copy Mercury source files
         cp -r -v ./app/. /home/runner/mozilla-unified/browser/app/
         cp -r -v ./browser/. /home/runner/mozilla-unified/browser/
