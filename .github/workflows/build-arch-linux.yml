@@ -79,9 +79,8 @@ jobs:
       run: |
         cd /home/runner/Mercury
         export TERM=xterm
-        # Use no mozconfig - let build system use defaults
-        # Just copy Mercury branding files to override Firefox
-        echo "# Empty mozconfig - using build system defaults" > /home/runner/mozilla-unified/mozconfig
+        # Remove any existing mozconfig to avoid compatibility issues
+        rm -f /home/runner/mozilla-unified/mozconfig
         # Copy Mercury source files
         cp -r -v ./app/. /home/runner/mozilla-unified/browser/app/
         cp -r -v ./browser/. /home/runner/mozilla-unified/browser/
@@ -95,7 +94,6 @@ jobs:
         cp -r -v ./policies/. /home/runner/mozilla-unified/policies/
         cp -r -v ./toolkit/. /home/runner/mozilla-unified/toolkit/
         cp -r -v ./testing/. /home/runner/mozilla-unified/testing/
-        cp -v ./mozconfigs/ga /home/runner/mozilla-unified/
       env:
         HOME: /home/runner
         HG_SRC_DIR: /home/runner/mozilla-unified
