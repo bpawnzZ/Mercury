@@ -80,7 +80,7 @@ jobs:
         cd /home/runner/Mercury
         export TERM=xterm
         # Copy the minimal mozconfig to the build directory
-        cp -v ./.github/mozconfig-minimal /home/runner/mozilla-unified/mozconfig
+        cp -v .github/mozconfig-minimal /home/runner/mozilla-unified/mozconfig
         # Copy Mercury source files
         cp -r -v ./app/. /home/runner/mozilla-unified/browser/app/
         cp -r -v ./browser/. /home/runner/mozilla-unified/browser/
